@@ -1,0 +1,49 @@
+﻿
+@model nForums.Models.POST
+
+@{
+    Layout = null;
+}
+<div class="modal fade" id="EditPost" style="margin-left:20%;" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="left:0;">
+        <div class="modal-content" style="width:70%;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Đóng</span>
+                </button>
+                <h4 class="modal-title">Sửa bài viết</h4>
+            </div>
+            @using (Html.BeginForm("EditPost", "Post", FormMethod.Post))
+            {
+                <div class="modal-body">
+
+                    @Html.AntiForgeryToken()
+                    <dl class="dl-horizontal">
+                        <dt>
+                            Chủ đề
+                        </dt>
+                        <dd>
+                            <input class="form-group" type="text" placeholder="@Model.SUBJECT" required id="subject" name="subject" spellcheck="true">
+                          
+                        </dd>
+                        <dt>
+                            Nội dung bình luận:
+                        </dt>
+                        <dd>
+                            <input class="form-group" type="text" placeholder="@Model.CONTEN" required id="comment-content" name="comment-content" spellcheck="true">
+                            <input type="hidden" name="POST_ID" class="form-control input-sm field" style="width: 300px; margin-bottom: 15px; " value="@Model.ID">
+                        </dd>
+                    </dl>
+                </div><!-- /.modal-body -->
+                <div class="modal-footer">
+                    <button class="btn submit-Cmt btn-default" type="submit" name="submit">Xác nhận</button>
+                    <button type="button" class="btn btn-success"  data-dismiss="modal">Đóng</button>
+                </div><!-- /.modal-footer -->
+            }
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+
+

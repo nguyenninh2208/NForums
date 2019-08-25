@@ -1,0 +1,49 @@
+﻿@model nForums.Models.POST
+
+@{
+    Layout = null;
+}
+<div class="modal fade" id="SubmitComment" style="margin-left:20%;" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="left:0;">
+        <div class="modal-content" style="width:70%;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Đóng</span>
+                </button>
+                <h4 class="modal-title">Đăng bình luận</h4>
+            </div>
+            @using (Html.BeginForm("PostComment", "Comment", FormMethod.Post))
+            {
+                <div class="modal-body">
+
+                    @Html.AntiForgeryToken()
+                    <dl class="dl-horizontal">
+                        <dt>
+                            Nội dung bình luận:
+                        </dt>
+                        <dd>
+                            <input type="text" placeholder="Nhập bình luận" required id="comment" name="comment" spellcheck="true"> 
+                            <input type="hidden" name="POST_ID" class="form-control input-sm field" style="width: 300px; margin-bottom: 15px; " value="@Model.ID">
+                        </dd>
+                    </dl>
+                </div><!-- /.modal-body -->
+                <div class="modal-footer">
+                    <button class="btn submit-Cmt" type="submit" style="background-color:#6cf; color:white;" name="submit">Bình luận</button>
+                    <button type="button" class="btn" style="background-color:#6cf; color:white;" data-dismiss="modal">Đóng</button>
+                </div><!-- /.modal-footer -->
+            }
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<script type="text/javascript">
+   
+        $('.submit-Cmt').click(function () {
+            var contentCmt = $('#comment').val();
+            if (contentCmt = "") {
+                alert("Không được để trống nội dung bình luận");
+            }
+        })
+    
+</script>

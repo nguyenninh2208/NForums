@@ -1,0 +1,324 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="NFORUMSModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="CATEGORY">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" />
+    <Property Name="NAME" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="DESCRIPTION" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="CREATED" Type="DateTime" Precision="0" />
+    <NavigationProperty Name="THREADs" Relationship="Self.FK_THREAD_CATEGORY" FromRole="CATEGORY" ToRole="THREAD" />
+  </EntityType>
+  <EntityType Name="POST">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" />
+    <Property Name="SUBJECT" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="CONTEN" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="CREATED" Type="DateTime" Precision="0" />
+    <Property Name="THREAD_ID" Type="Int32" />
+    <Property Name="USER_ID" Type="Int32" />
+    <Property Name="STATUS" Type="Int32" />
+    <NavigationProperty Name="THREAD" Relationship="Self.FK_POST_THREAD" FromRole="POST" ToRole="THREAD" />
+    <NavigationProperty Name="USER" Relationship="Self.FK_POST_USER" FromRole="POST" ToRole="USER" />
+    <NavigationProperty Name="COMMENTs" Relationship="NFORUMSModel.FK_COMMENT_POST" FromRole="POST" ToRole="COMMENT" />
+    <NavigationProperty Name="LIKE_POST" Relationship="NFORUMSModel.FK_LIKE_POST_POST" FromRole="POST" ToRole="LIKE_POST" />
+    <NavigationProperty Name="REPORT_POST" Relationship="NFORUMSModel.FK_REPORT_POST_POST" FromRole="POST" ToRole="REPORT_POST" />
+  </EntityType>
+  <EntityType Name="sysdiagram">
+    <Key>
+      <PropertyRef Name="diagram_id" />
+    </Key>
+    <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="principal_id" Type="Int32" Nullable="false" />
+    <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="version" Type="Int32" />
+    <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+  </EntityType>
+  <EntityType Name="THREAD">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" />
+    <Property Name="SUBJECT" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="CREATED" Type="DateTime" Precision="0" />
+    <Property Name="USER_ID" Type="Int32" />
+    <Property Name="STATUS" Type="Int32" />
+    <Property Name="CATEGORY_ID" Type="Int32" />
+    <NavigationProperty Name="CATEGORY" Relationship="Self.FK_THREAD_CATEGORY" FromRole="THREAD" ToRole="CATEGORY" />
+    <NavigationProperty Name="POSTs" Relationship="Self.FK_POST_THREAD" FromRole="THREAD" ToRole="POST" />
+    <NavigationProperty Name="USER" Relationship="Self.FK_THREAD_USER" FromRole="THREAD" ToRole="USER" />
+  </EntityType>
+  <EntityType Name="USER">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" />
+    <Property Name="USERNAME" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="PASSWORD" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Email" Type="String" MaxLength="254" FixedLength="false" Unicode="false" />
+    <Property Name="CREATED" Type="DateTime" Precision="0" />
+    <Property Name="IS_MODERATOR" Type="Byte" />
+    <Property Name="STATUS" Type="Int32" />
+    <NavigationProperty Name="POSTs" Relationship="Self.FK_POST_USER" FromRole="USER" ToRole="POST" />
+    <NavigationProperty Name="THREADs" Relationship="Self.FK_THREAD_USER" FromRole="USER" ToRole="THREAD" />
+    <NavigationProperty Name="COMMENTs" Relationship="NFORUMSModel.FK_COMMENT_USER" FromRole="USER" ToRole="COMMENT" />
+    <Property Name="GENDER" Type="Byte" />
+    <NavigationProperty Name="REPLY_COMMENT" Relationship="NFORUMSModel.FK_REPLY_COMMENT_USER1" FromRole="USER" ToRole="REPLY_COMMENT" />
+    <NavigationProperty Name="LIKE_POST" Relationship="NFORUMSModel.FK_LIKE_POST_USER" FromRole="USER" ToRole="LIKE_POST" />
+    <NavigationProperty Name="REPORT_POST" Relationship="NFORUMSModel.FK_REPORT_POST_USER" FromRole="USER" ToRole="REPORT_POST" />
+  </EntityType>
+  <Association Name="FK_THREAD_CATEGORY">
+    <End Role="CATEGORY" Type="Self.CATEGORY" Multiplicity="0..1" />
+    <End Role="THREAD" Type="Self.THREAD" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="CATEGORY">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="THREAD">
+        <PropertyRef Name="CATEGORY_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_POST_THREAD">
+    <End Role="THREAD" Type="Self.THREAD" Multiplicity="0..1" />
+    <End Role="POST" Type="Self.POST" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="THREAD">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="POST">
+        <PropertyRef Name="THREAD_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_POST_USER">
+    <End Role="USER" Type="Self.USER" Multiplicity="0..1" />
+    <End Role="POST" Type="Self.POST" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="USER">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="POST">
+        <PropertyRef Name="USER_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_THREAD_USER">
+    <End Role="USER" Type="Self.USER" Multiplicity="0..1" />
+    <End Role="THREAD" Type="Self.THREAD" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="USER">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="THREAD">
+        <PropertyRef Name="USER_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="NFORUMSEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="CATEGORies" EntityType="Self.CATEGORY" />
+    <EntitySet Name="POSTs" EntityType="Self.POST" />
+    <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
+    <EntitySet Name="THREADs" EntityType="Self.THREAD" />
+    <EntitySet Name="USERs" EntityType="Self.USER" />
+    <AssociationSet Name="FK_THREAD_CATEGORY" Association="Self.FK_THREAD_CATEGORY">
+      <End Role="CATEGORY" EntitySet="CATEGORies" />
+      <End Role="THREAD" EntitySet="THREADs" />
+    </AssociationSet>
+    <AssociationSet Name="FK_POST_THREAD" Association="Self.FK_POST_THREAD">
+      <End Role="THREAD" EntitySet="THREADs" />
+      <End Role="POST" EntitySet="POSTs" />
+    </AssociationSet>
+    <AssociationSet Name="FK_POST_USER" Association="Self.FK_POST_USER">
+      <End Role="USER" EntitySet="USERs" />
+      <End Role="POST" EntitySet="POSTs" />
+    </AssociationSet>
+    <AssociationSet Name="FK_THREAD_USER" Association="Self.FK_THREAD_USER">
+      <End Role="USER" EntitySet="USERs" />
+      <End Role="THREAD" EntitySet="THREADs" />
+    </AssociationSet>
+    <EntitySet Name="COMMENTs" EntityType="NFORUMSModel.COMMENT" />
+    <AssociationSet Name="FK_COMMENT_POST" Association="NFORUMSModel.FK_COMMENT_POST">
+      <End Role="POST" EntitySet="POSTs" />
+      <End Role="COMMENT" EntitySet="COMMENTs" />
+    </AssociationSet>
+    <AssociationSet Name="FK_COMMENT_USER" Association="NFORUMSModel.FK_COMMENT_USER">
+      <End Role="USER" EntitySet="USERs" />
+      <End Role="COMMENT" EntitySet="COMMENTs" />
+    </AssociationSet>
+    <EntitySet Name="REPLY_COMMENT" EntityType="NFORUMSModel.REPLY_COMMENT" />
+    <AssociationSet Name="FK_REPLY_COMMENT_COMMENT" Association="NFORUMSModel.FK_REPLY_COMMENT_COMMENT">
+      <End Role="COMMENT" EntitySet="COMMENTs" />
+      <End Role="REPLY_COMMENT" EntitySet="REPLY_COMMENT" />
+    </AssociationSet>
+    <AssociationSet Name="FK_REPLY_COMMENT_USER1" Association="NFORUMSModel.FK_REPLY_COMMENT_USER1">
+      <End Role="USER" EntitySet="USERs" />
+      <End Role="REPLY_COMMENT" EntitySet="REPLY_COMMENT" />
+    </AssociationSet>
+    <EntitySet Name="LIKE_POST" EntityType="NFORUMSModel.LIKE_POST" />
+    <EntitySet Name="REPORT_POST" EntityType="NFORUMSModel.REPORT_POST" />
+    <AssociationSet Name="FK_LIKE_POST_POST" Association="NFORUMSModel.FK_LIKE_POST_POST">
+      <End Role="POST" EntitySet="POSTs" />
+      <End Role="LIKE_POST" EntitySet="LIKE_POST" />
+    </AssociationSet>
+    <AssociationSet Name="FK_LIKE_POST_USER" Association="NFORUMSModel.FK_LIKE_POST_USER">
+      <End Role="USER" EntitySet="USERs" />
+      <End Role="LIKE_POST" EntitySet="LIKE_POST" />
+    </AssociationSet>
+    <AssociationSet Name="FK_REPORT_POST_POST" Association="NFORUMSModel.FK_REPORT_POST_POST">
+      <End Role="POST" EntitySet="POSTs" />
+      <End Role="REPORT_POST" EntitySet="REPORT_POST" />
+    </AssociationSet>
+    <AssociationSet Name="FK_REPORT_POST_USER" Association="NFORUMSModel.FK_REPORT_POST_USER">
+      <End Role="USER" EntitySet="USERs" />
+      <End Role="REPORT_POST" EntitySet="REPORT_POST" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="COMMENT">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" />
+    <Property Name="CONTEN" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="POST_ID" Type="Int32" />
+    <Property Name="USER_ID" Type="Int32" />
+    <Property Name="CREATED" Type="DateTime" Precision="0" />
+    <NavigationProperty Name="POST" Relationship="NFORUMSModel.FK_COMMENT_POST" FromRole="COMMENT" ToRole="POST" />
+    <NavigationProperty Name="USER" Relationship="NFORUMSModel.FK_COMMENT_USER" FromRole="COMMENT" ToRole="USER" />
+    <NavigationProperty Name="REPLY_COMMENT" Relationship="NFORUMSModel.FK_REPLY_COMMENT_COMMENT" FromRole="COMMENT" ToRole="REPLY_COMMENT" />
+  </EntityType>
+  <Association Name="FK_COMMENT_POST">
+    <End Type="NFORUMSModel.POST" Role="POST" Multiplicity="0..1" />
+    <End Type="NFORUMSModel.COMMENT" Role="COMMENT" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="POST">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="COMMENT">
+        <PropertyRef Name="POST_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_COMMENT_USER">
+    <End Type="NFORUMSModel.USER" Role="USER" Multiplicity="0..1" />
+    <End Type="NFORUMSModel.COMMENT" Role="COMMENT" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="USER">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="COMMENT">
+        <PropertyRef Name="USER_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="REPLY_COMMENT">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" />
+    <Property Name="CONTEN" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="CREATED" Type="DateTime" Precision="0" />
+    <Property Name="COMMENT_ID" Type="Int32" />
+    <Property Name="USER_ID" Type="Int32" />
+    <NavigationProperty Name="COMMENT" Relationship="NFORUMSModel.FK_REPLY_COMMENT_COMMENT" FromRole="REPLY_COMMENT" ToRole="COMMENT" />
+    <NavigationProperty Name="USER" Relationship="NFORUMSModel.FK_REPLY_COMMENT_USER1" FromRole="REPLY_COMMENT" ToRole="USER" />
+  </EntityType>
+  <Association Name="FK_REPLY_COMMENT_COMMENT">
+    <End Type="NFORUMSModel.COMMENT" Role="COMMENT" Multiplicity="0..1" />
+    <End Type="NFORUMSModel.REPLY_COMMENT" Role="REPLY_COMMENT" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="COMMENT">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="REPLY_COMMENT">
+        <PropertyRef Name="COMMENT_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_REPLY_COMMENT_USER1">
+    <End Type="NFORUMSModel.USER" Role="USER" Multiplicity="0..1" />
+    <End Type="NFORUMSModel.REPLY_COMMENT" Role="REPLY_COMMENT" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="USER">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="REPLY_COMMENT">
+        <PropertyRef Name="USER_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="LIKE_POST">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" />
+    <Property Name="USER_ID" Type="Int32" />
+    <Property Name="POST_ID" Type="Int32" />
+    <Property Name="CREATED" Type="DateTime" Precision="0" />
+    <NavigationProperty Name="POST" Relationship="NFORUMSModel.FK_LIKE_POST_POST" FromRole="LIKE_POST" ToRole="POST" />
+    <NavigationProperty Name="USER" Relationship="NFORUMSModel.FK_LIKE_POST_USER" FromRole="LIKE_POST" ToRole="USER" />
+  </EntityType>
+  <EntityType Name="REPORT_POST">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" />
+    <Property Name="POST_ID" Type="Int32" />
+    <Property Name="USER_ID" Type="Int32" />
+    <Property Name="REASON_REPORT" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="CREATED" Type="DateTime" Precision="0" />
+    <NavigationProperty Name="POST" Relationship="NFORUMSModel.FK_REPORT_POST_POST" FromRole="REPORT_POST" ToRole="POST" />
+    <NavigationProperty Name="USER" Relationship="NFORUMSModel.FK_REPORT_POST_USER" FromRole="REPORT_POST" ToRole="USER" />
+  </EntityType>
+  <Association Name="FK_LIKE_POST_POST">
+    <End Type="NFORUMSModel.POST" Role="POST" Multiplicity="0..1" />
+    <End Type="NFORUMSModel.LIKE_POST" Role="LIKE_POST" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="POST">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="LIKE_POST">
+        <PropertyRef Name="POST_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_LIKE_POST_USER">
+    <End Type="NFORUMSModel.USER" Role="USER" Multiplicity="0..1" />
+    <End Type="NFORUMSModel.LIKE_POST" Role="LIKE_POST" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="USER">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="LIKE_POST">
+        <PropertyRef Name="USER_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_REPORT_POST_POST">
+    <End Type="NFORUMSModel.POST" Role="POST" Multiplicity="0..1" />
+    <End Type="NFORUMSModel.REPORT_POST" Role="REPORT_POST" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="POST">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="REPORT_POST">
+        <PropertyRef Name="POST_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_REPORT_POST_USER">
+    <End Type="NFORUMSModel.USER" Role="USER" Multiplicity="0..1" />
+    <End Type="NFORUMSModel.REPORT_POST" Role="REPORT_POST" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="USER">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="REPORT_POST">
+        <PropertyRef Name="USER_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

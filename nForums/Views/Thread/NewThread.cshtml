@@ -1,0 +1,65 @@
+﻿@model nForums.Models.POST
+@{
+    ViewBag.Title = "NewThread";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Tạo bài đăng mới</h2>
+
+    <form action="/" method="post" id="create-thread" role="form" style="padding:2%;">
+        @Html.ValidationSummary(true)
+        @Html.AntiForgeryToken()
+    <div class="row">
+      
+        <div class="row">
+            <div class="form-group">
+                @Html.LabelFor(m => m.SUBJECT, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.SUBJECT, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.SUBJECT, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.CONTEN, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.CONTEN, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.SUBJECT, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="form-group">
+        <button class="btn btn-primary" type="submit" onclick="createThread()">Tạo</button>
+       
+    </div>
+        </form>
+    <h3 id="alert-mess" style="color:red; font-weight:bold">
+      
+    </h3>
+
+
+
+<script type="text/javascript">
+    function createThread() {
+        var data = $('#create-thread').serialize();
+        var url = '@Url.Action("Newthread", "Thread")';
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: data,
+            success: function (res) {
+                if (res.length >= 1) {
+                   alert(res)
+                }
+                else {
+                    alert("Lỗi");
+                }
+            },
+            error: function (errorRespone) {
+                $('#message').html(errorRespone.responeText);
+            }
+        })
+    }
+   
+</script>

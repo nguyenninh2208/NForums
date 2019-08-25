@@ -1,0 +1,91 @@
+﻿@model nForums.Models.USER
+
+@{
+    ViewBag.Title = "Đăng nhập";
+}
+
+<h2>@ViewBag.Title</h2>
+<div class="row">
+    <div class="col-md-8">
+        <section id="loginForm">
+
+                @Html.AntiForgeryToken()
+            <small class="text-danger" id="message-error"></small>
+                <hr />
+                @Html.ValidationSummary(true)
+                <div class="form-group">
+                    @Html.LabelFor(m => m.USERNAME, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-12">
+                        @Html.TextBox("Uname", null, new { @class = "form-control", @placeholder = "Tên đăng nhập" })
+                        @Html.ValidationMessageFor(m => m.USERNAME)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.PASSWORD, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-12">
+                        @Html.Password("pwd", null, new { @class = "form-control", @placeholder = "Mật khẩu" })
+                        @Html.ValidationMessageFor(m => m.PASSWORD)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-10">
+                        <input type="submit" value="Đăng nhập" class="btn btn-default text-center" id="loginSubmit"/>
+                    </div>
+                </div>
+                <p style="float:left;">
+                    @Html.ActionLink("Đăng ký", "Register") Bạn chưa có tài khoản ?
+                </p>
+            
+        </section>
+    </div>
+ 
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script type="text/javascript">
+    $("#loginSubmit").click(function (e) {
+        e.preventDefault();
+        var u = $("#Uname").val();
+        var p = $('#pwd').val();
+        var mess = $("#message-error");
+        if (u == "") {
+            mess.html("Không được để trống tài khoản");
+            return false;
+        } else if (p == "") {
+            mess.html("Không được để trống mật khẩu");
+            return false;
+        }
+        else {
+            $.ajax({
+                url: "/Account/Login",
+                data: {
+                    username: u,
+                    password: p
+                },
+                type: "POST",
+                success: function (rs) {
+                    if (rs.toString() == "success") {
+                        alert("Đăng nhập thành công");
+                        window.location = "/Home/Index";
+                    }
+                    else if (rs.toString() == "!Username") {
+                        mess.html("Không tìm thấy tên tài khoản");
+
+                    }
+                    else if (rs.toString() == "!Password") {
+                        mess.html("Sai mật khẩu");
+
+                    }
+                    else {
+                        mess.html("Kiểm tra dữ liệu nhập");
+
+                    }
+                }, error: function (rs) {
+                    alert(rs.toString());
+                }
+            })
+        }
+    });
+</script>

@@ -1,0 +1,90 @@
+﻿@model nForums.Models.USER
+@{
+    ViewBag.Title = "Đăng ký";
+}
+<h2>@ViewBag.Title.</h2>
+
+<form action="/" method="post" id="form-signup" role="form">
+    @Html.ValidationSummary(true)
+    @Html.AntiForgeryToken()
+    <hr />
+    <div class="form-group">
+        @Html.LabelFor(m => m.USERNAME, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(m => m.USERNAME, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.USERNAME, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.PASSWORD, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            @Html.PasswordFor(m => m.PASSWORD, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.PASSWORD, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+            @Html.LabelFor(m => m.GENDER, new { @class = "col-md-2 control-label" })
+            <div class="animated-radio-button">
+                <label class="for-radio">
+                    @Html.RadioButtonFor(x => x.GENDER, "1", new { @class = "form-check-control form-check-control1" })
+                    <span class="label-text">Nam</span>
+                </label>
+                <label style="margin-left:10px;" class="for-radio">
+                    @Html.RadioButtonFor(x => x.GENDER, "0", new { @class = "form-check-control form-check-control1" })
+                    <span class="label-text">Nữ</span>
+                </label>
+                @Html.ValidationMessageFor(x => x.GENDER, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <button type="submit" class="btn btn-default" value="Đăng kí" onclick="submitRegister() ">Đăng kí</button>
+            <button type="reset" class="btn btn-default">Nhập lại</button>
+        </div>
+        <div class="col-md-8 col-lg-8 col-sm-8">
+            <small>* Bắt buộc</small>
+            <small class="text-danger" id="message"></small>
+        </div>
+    </div>
+</form>
+    <script type="text/javascript">
+            function submitRegister() {
+                debugger
+                var data = $('#form-signup').serialize();
+                var urlg = '@Url.Action("Register", "Account")';
+                $.ajax({
+                    url: urlg,
+                    type: "POST",
+                    data: data,
+                    success: function (res) {
+                        if (res.length > 0) {
+                            alert("Đăng ký thành công");
+                            window.location = "/Home/Index";
+                        }
+                    },
+                    error: function (errorRespone) {
+                        $('#message').html(errorRespone.responeText);
+                    }
+                })
+            }
+
+        </script>
+
+
+
+
+
+
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }
+
+

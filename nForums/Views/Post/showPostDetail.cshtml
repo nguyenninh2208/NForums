@@ -1,0 +1,458 @@
+﻿@model nForums.Models.POST
+@{
+    ViewBag.Title = @Model.SUBJECT;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="col-md-12 column col-cmt" style="padding:1%;">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <section class="panel-title">
+                
+                <time class="" style="float:right;">
+                    <i class="fa fa-calendar"></i> @String.Format("{0:dd/MM/yyyy}", @Model.CREATED)
+                </time>
+                <section class="" id="id" style="">
+                    <abbr title="count of posts in this topic">#1</abbr>
+                    <input id="id-post" class="hidden" data-id="@Model.ID" />
+                </section>
+            </section>
+        </div>
+        <section class="row panel-body">
+            <section class="col-md-9">
+                <h2 style="font-weight:bold;"> <i class="fa fa-smile-o"></i> @Model.SUBJECT</h2>
+                <hr>
+                @Model.CONTEN
+            </section>
+
+            <section id="user-description" class="col-md-3 ">
+                <section class="well">
+                    <div class="dropdown" style="text-align:center; font-weight:bold; font-size:large;">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cricle"></i>@Model.USER.USERNAME<span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#"><i class="fa fa-user"></i> Xem hồ sơ</a></li>
+                            <li><a href="#"><i class="fa fa-envelope"></i> Gửi tin nhắn</a></li>
+                            <li><a href="#"><i class="fa fa-th-list"></i>Xem tất cả bài đăng</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#"><i class="fa fa-plus"></i>Thêm vào danh sách liên lạc</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#"><i class="fa fa-cogs"></i> Quản lý người dùng (Dành cho Admin)</a></li>
+                        </ul>
+                    </div>
+                    <figure>
+                        <figcaption class="text-center">Thành viên thường <br><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half"></i> </figcaption>
+                    </figure>
+                    <ul>
+                        <li>Ngày tham gia: @String.Format("{0:dd/MM/yyyy}", @Model.USER.CREATED)</li>
+                        <li>Số bài đăng: 785 </li>
+                        <li>Số lượt thích:150</li>
+                    </ul>
+
+                </section>
+            </section>
+
+        </section>
+        <div class="panel-footer">
+            <div class="row">
+                <section class="col-md-2 ">
+
+                    @*@using (Html.BeginForm("LikePost", "Post", FormMethod.Post))
+                        {*@
+                    <i class="fa fa-thumbs-up "></i><a style="cursor:pointer;" onclick="ButtonLike(@Model.ID)"> Thích </a>
+
+
+
+                    | <i class="fa fa-warning "></i><a href="#"> Báo cáo </a>
+                </section>
+                <section id="thanks" class="col-md-6">
+                    <small><a style="cursor:pointer;" onclick="SubmitLike(@Model.ID)" data-toggle="tooltip"> <i class="fa fa-heart "></i><span style="font-size:large; font-weight:bold;"> @Model.LIKE_POST.Count </span> người thích</a> </small><br>
+
+                </section>
+                <section class="col-md-4">
+
+                    <i class="fa fa-mail-reply "></i><a class="btn submit-comment" href="@Url.Action("PostComment", "Comment", new { id = @Model.ID} )"> Bình luận </a>
+
+
+                    @if (Session["UserID"] != null)
+                    {
+                        int idUser = (int)Session["UserID"];
+                        if (idUser == @Model.USER_ID)
+                        {
+                            <i class="fa fa-edit "></i>
+                            <a class="btn edit-post" href="@Url.Action("EditPost", "Post", new { id = @Model.ID })">
+                                Sửa bài
+                            </a>
+                            <i class="fa fa-trash"></i><a class="btn submit-comment" onclick="DelPost(@Model.ID)"> Xóa </a>
+                        }
+                    }
+
+
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" id="result-cmt">
+
+</div>
+
+
+@******************************************Modal-Success********************************************@
+<div class="modal fade" id="ModalShowLike" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="left:0;">
+        <div class="modal-content" style="padding-left:70px; padding-right: 30px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Bài đăng này có <span id="count-like"></span> lượt thích </h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="width: 10px; height: 10px; margin-top: -30px;">
+                    <span aria-hidden="true" style="font-size:30px;">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" style="overflow-y: scroll; max-height:400px;   ">
+                <table class="table table-sm" style="width: 100%;">
+                    <thead>
+                        <tr class="active" style="border:none;">
+                            <th>Tên</th>
+                            <th>Thời gian </th>
+                        </tr>
+                    </thead>
+                    <tbody id="result-show-like"></tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn" style="background-color:#6cf; color:white;" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+@******************************************Modal-Success*********************************************@
+<script type="text/javascript">
+
+    function ButtonLike(id) {
+        var id = id;
+        var urlg = '@Url.Action("LikePost", "Post")';
+        $.ajax({
+            type: "GET",
+            url: urlg,
+            data: { id: id },
+            success: function (data) {
+                alert(data.toString());
+            },
+        });
+    }
+
+    function SubmitLike(id) {
+        $('#ModalShowLike').modal('show');
+        $('#result-show-like').html('');
+        var id = id;
+        $.ajax({
+            url: '/Post/showLikePost',
+            type: "GET",
+            data: {
+                id: id
+            },
+            success: function (res) {
+                var html = '';
+                var length = res.length;
+                $('#count-like').text(length);
+                if (length == 0) {
+                    $('#result-show-like').html('');
+                    var html = '';
+                    $('#result-show-like').append('<h2 class="alert text-center" style="margin-right:20%;">Bài đăng này chưa có lượt thích nào</h2>');
+
+                }
+                $.each(res, function (key, item) {
+                    html += '<tr>';
+                    html += '<td style="vertical-align: middle;">' + item.username + ' </td>';
+                    html += '<td style="vertical-align: middle;">' + dateFormat(new Date(parseInt((item.time).match(/\d+/)[0]))) + '</td>';
+                    html += '</tr>';
+                });
+                $('tbody#result-show-like').append(html);
+            },
+            error: function (xhr, status, error) {
+                alert(xhr.responseText);
+            }
+        })
+    }
+
+
+
+
+    function DelPost(q) {
+        var id = q;
+        var urlXoaItem = '@Url.Action("deletePost", "Post")';
+        //$('#SubmitComment').modal('hidden');
+        //$('.col-cmt').html('');
+        $.ajax({
+            url: urlXoaItem,
+            type: "POST",
+            data: { id: id },
+            success: function (res) {
+                if (res.toString() != "") {
+                    alert("Xóa thành công");
+                    location.href = '/Home/Index';
+                }
+            }
+        });
+    }
+
+    $('.submit-comment').click(function (e) {
+        var e_href = $(this).attr('href');
+        //k thuc hien action mac dinh
+        e.preventDefault();
+        //GET
+        $.ajax({
+            url: e_href,
+            type: "GET",
+            contentType: 'application/json; charset=utf-8',
+            success: function (res) {
+                //add modal vao layout chinh vào dưới cùng của class
+                $('.col-cmt').prepend(res);
+                $('#SubmitComment').modal('show');
+            }
+        })
+    })
+    $('.edit-post').click(function (e) {
+        var e_href = $(this).attr('href');
+        //k thuc hien action mac dinh
+        e.preventDefault();
+        //GET
+        $.ajax({
+            url: e_href,
+            type: "GET",
+            contentType: 'application/json; charset=utf-8',
+            success: function (res) {
+                //add modal vao layout chinh vào dưới cùng của class
+                $('.col-cmt').prepend(res);
+                $('#EditPost').modal('show');
+            }
+        })
+    })
+
+    function dateFormat(d) {
+        return (d.getDate() + "").padStart(2, "0")
+           + "/" + ((d.getMonth() + 1) + "").padStart(2, "0")
+           + "/" + d.getFullYear();
+    }
+
+    //$(document).ready(function () {
+    //    var body = $('body');
+    //    if (body.hasClass('edit-some-stuff')) {
+    //        // do someting
+    //    }
+    //    if (body.hasClass('delete-some-stuff')) {
+    //        // do someting
+    //    }
+    //});
+
+
+    $(document).ready(function () {
+        var id = $('#id-post').attr("data-id");
+        var i = 1;
+        $.ajax({
+            url: '/Post/showComment',
+            type: "GET",
+            data: {
+                id: id
+            },
+            success: function (res) {
+                var html = '';
+                $.each(res, function (key, item) {
+                    var html = '';
+                    i++;
+                    html += '<div class="col-md-12 column" id="cmtCol" data-id="' + item.maCmt + '" style="padding:1%;">';
+                    html += '<div class="panel panel-default">';
+                    html += '<div class="panel-heading">';
+                    html += '<section class="panel-title">';
+                    html += '<time class="" style="float:right;">';
+                    html += '<i class="fa fa-calendar"></i>' + dateFormat(new Date(parseInt((item.thoigianCmt).match(/\d+/)[0]))) + '';
+                    html += '</time>';
+                    html += '<section class="" id="id" style="">';
+                    html += '<abbr title="count of posts in this topic">#' + i + '</abbr>';
+                    html += '<input id="id-post" class="hidden" data-id="' + item.maNguoiCmt + '" />';
+                    html += '</section>';
+                    html += '</section>';
+                    html += '</div>';
+                    html += '<section class="row panel-body">';
+                    html += '<section class="col-md-9">';
+                    html += '<h2 style="font-weight:bold;"> <i class="fa fa-smile-o"></i> ' + item.tieude + '</h2>';
+                    html += '<hr>';
+                    html += '' + item.noidungCmt + '';
+                    html += '</section>';
+                    html += '';
+                    html += '<section id="user-description" class="col-md-3 ">';
+                    html += '<section class="well">';
+                    html += '<div class="dropdown" style="text-align:center; font-weight:bold; font-size:large;">';
+                    html += '<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cricle"></i>' + item.tenNguoiCmt + '<span class="caret"></span></a>';
+                    html += '<ul class="dropdown-menu" role="menu">';
+                    html += '<li><a href="#"><i class="fa fa-user"></i> Xem hồ sơ</a></li>';
+                    html += '<li><a href="#"><i class="fa fa-envelope"></i> Gửi tin nhắn</a></li>';
+                    html += '<li><a href="#"><i class="fa fa-th-list"></i>Xem tất cả bài đăng</a></li>';
+                    html += '<li class="divider"></li>';
+                    html += '<li><a href="#"><i class="fa fa-plus"></i>Thêm vào danh sách liên lạc</a></li>';
+                    html += '<li class="divider"></li>';
+                    html += '<li><a href="#"><i class="fa fa-cogs"></i> Quản lý người dùng (Dành cho Admin)</a></li>';
+                    html += '</ul>';
+                    html += '</div>';
+                    html += '<figure>';
+                    html += '<figcaption class="text-center">Thành viên thường <br><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half"></i> </figcaption>';
+                    html += '</figure>';
+                    html += '<ul>';
+                    html += '<li>Ngày tham gia:' + dateFormat(new Date(parseInt((item.ngaythamGianNguoiCmt).match(/\d+/)[0]))) + '</li>';
+                    html += '<li>Số bài đăng: 785</li>';
+                    html += '<li>Số lượt thích:150</li>';
+                    html += '</ul>';
+                    html += '';
+                    html += '</section>';
+                    html += '</section>';
+                    html += '';
+                    html += '</section>';
+                    html += '<div class="panel-footer">';
+                    html += '<div class="row">';
+                    html += '<section class="col-md-2 ">';
+                    html += '<i class="fa fa-thumbs-up "></i><a href="#"> Thích </a>| <i class="fa fa-warning "></i><a href="#"> Báo cáo </a>';
+                    html += '</section>';
+                    html += '<section id="thanks" class="col-md-6">';
+                    html += '<small><a href="#" data-toggle="tooltip" title="You and david,ehsan,john doe"> <i class="fa fa-heart "></i>Số người thích</a> </small><br>';
+                    html += '';
+                    html += '</section>';
+                    html += '<section class="col-md-4">';
+                    html += '<span class="fa-stack">';
+                    html += '<i class="fa fa-quote-right fa-stack-1x"></i>';
+                    html += '<i class="fa fa-comment-o fa-lg fa-stack-1x"></i>';
+                    html += '</span><a class="btn reply-cmt" id="' + item.maCmt + '" style="padding:0px;">Trả lời   </a> |';
+                    html += '  <i class="fa fa-edit "></i><a class="btn" href="#" style="padding:0px;">Sửa   </a> |';
+                    html += '  <i class="fa fa-trash "></i><a class="btn" href="#" style="padding:0px;">Xóa  </a>';
+                    html += '</section>';
+                    html += '</div>';
+                    html += '</div>';
+                    html+='<div class="row" style="padding:2%;">';
+                    html += '<a class="class-cmt" id="reply_cmt_' + item.maCmt + '" onclick="return clickReplycmt(' + item.maCmt + ');" data-id="' + item.maCmt + '" style="cursor:pointer;">Xem <span id="count_reply_cmt"></span> trả lời cho bình luận này</a>';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '</div>';
+                    $('#result-cmt').append(html);
+                   
+                }
+)
+            },
+            error: function (xhr, status, error) {
+                alert(xhr.responseText);
+            }
+        })
+        .done(function () {
+            $(window).load(clickReplycmt(id));
+        })
+       
+    }
+    )
+
+   
+
+
+    function clickReplycmt(id) {
+        var id = id;
+        $('#reply_cmt_' + id).html('');
+        $('#count_reply_cmt').html('');
+        $.ajax({
+            url: '/Comment/showReplyComment',
+            type: "GET",
+            data : {id : id },
+            success: function (res) {
+                var html = '';
+                $.each(res, function (key, item) {
+                    var html = '';
+                    var count = res.length;
+                    if (count == 0) {
+                        alert("Bình luận này không có trả lời");
+                    }
+                    $('#count_reply_cmt').append(count);
+                    html += '<div class="col-md-12 column" style="padding:1%;">';
+                    html += '<div class="panel panel-default">';
+                    html += '<div class="panel-heading">';
+                    html += '<section class="panel-title">';
+                    html += '<time class="" style="float:right;">';
+                    html += '<i class="fa fa-calendar"></i>' + dateFormat(new Date(parseInt((item.thoigianCmt).match(/\d+/)[0]))) + '';
+                    html += '</time>';
+                    html += '<section class="" id="id" style="">';
+                    html += '<abbr title="count of posts in this topic"># Trả lời ' + item.maCmt + '</abbr>';
+                    html += '<input id="id-post" class="hidden" data-id="' + item.maNguoiCmt + '" />';
+                    html += '</section>';
+                    html += '</section>';
+                    html += '</div>';
+                    html += '<section class="row panel-body">';
+                    html += '<section class="col-md-9">';
+                    html += '<h2 style="font-weight:bold;"> <i class="fa fa-smile-o"></i> ' + item.tieude + '</h2>';
+                    html += '<hr>';
+                    html += '<p>Quote:</p>';
+                    html += '<div class="row" style=" font-style:italic; background: rgba(0,0,0,0.07); padding:2%; border:1px solid;">' + item.noidungCmtBanDau + '</div>';
+                    html += '' + item.noidungCmt + '';
+                    html += '</section>';
+                    html += '';
+                    html += '<section id="user-description" class="col-md-3 ">';
+                    html += '<section class="well">';
+                    html += '<div class="dropdown" style="text-align:center; font-weight:bold; font-size:large;">';
+                    html += '<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cricle"></i>' + item.tenNguoiCmt + '<span class="caret"></span></a>';
+                    html += '<ul class="dropdown-menu" role="menu">';
+                    html += '<li><a href="#"><i class="fa fa-user"></i> Xem hồ sơ</a></li>';
+                    html += '<li><a href="#"><i class="fa fa-envelope"></i> Gửi tin nhắn</a></li>';
+                    html += '<li><a href="#"><i class="fa fa-th-list"></i>Xem tất cả bài đăng</a></li>';
+                    html += '<li class="divider"></li>';
+                    html += '<li><a href="#"><i class="fa fa-plus"></i>Thêm vào danh sách liên lạc</a></li>';
+                    html += '<li class="divider"></li>';
+                    html += '<li><a href="#"><i class="fa fa-cogs"></i> Quản lý người dùng (Dành cho Admin)</a></li>';
+                    html += '</ul>';
+                    html += '</div>';
+                    html += '<figure>';
+                    html += '<figcaption class="text-center">Thành viên thường <br><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half"></i> </figcaption>';
+                    html += '</figure>';
+                    html += '<ul>';
+                    html += '<li>Ngày tham gia:' + dateFormat(new Date(parseInt((item.ngaythamGianNguoiCmt).match(/\d+/)[0]))) + '</li>';
+                    html += '<li>Số bài đăng: 785</li>';
+                    html += '<li>Số lượt thích:150</li>';
+                    html += '</ul>';
+                    html += '';
+                    html += '</section>';
+                    html += '</section>';
+                    html += '';
+                    html += '</section>';
+                    html += '<div class="panel-footer">';
+                    html += '<div class="row">';
+                    html += '<section class="col-md-2 ">';
+                    html += '<i class="fa fa-thumbs-up "></i><a href="#"> Thích </a>| <i class="fa fa-warning "></i><a href="#"> Báo cáo </a>';
+                    html += '</section>';
+                    html += '<section id="thanks" class="col-md-6">';
+                    html += '<small><a href="#" data-toggle="tooltip" title="You and david,ehsan,john doe"> <i class="fa fa-heart "></i>Số người thích</a> </small><br>';
+                    html += '';
+                    html += '</section>';
+                    html += '<section class="col-md-4">';
+                    html += '<span class="fa-stack">';
+                    html += '<i class="fa fa-quote-right fa-stack-1x"></i>';
+                    html += '<i class="fa fa-comment-o fa-lg fa-stack-1x"></i>';
+                    html += '</span><a class="btn" onclick="ReplyComment()" style="padding:0px;">Trả lời   </a> |';
+                    html += '  <i class="fa fa-edit "></i><a class="btn" href="#" style="padding:0px;">Sửa   </a> |';
+                    html += '  <i class="fa fa-trash "></i><a class="btn" href="#" style="padding:0px;">Xóa  </a>';
+                    html += '</section>';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '</div>';
+                    $('#reply_cmt_' + id).append(html);
+                }
+    )
+            },
+            error: function (xhr, status, error) {
+                alert(xhr.responseText);
+            }
+        })
+    }
+
+      
+
+
+</script>

@@ -1,0 +1,124 @@
+﻿@model List<nForums.Models.CATEGORY>
+
+
+@{
+    ViewBag.Title = "Trang chủ";
+}
+<div class="row" style="padding:2%; background-color:white;" >
+    <table class=" table">
+        <thead class="black white-text" style="background:grey; color:white;">
+            <tr>
+                <th scope="col">Đại sảnh</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody id="showHall"></tbody>
+    </table>
+    <table class=" table">
+        <thead class="black white-text" style="background: grey; color: white;">
+            <tr>
+                <th scope="col">Khu vui chơi giải trí</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody id="showCate"></tbody>
+    </table>
+    <table class=" table">
+        <thead class="black white-text" style="background: grey; color: white;">
+            <tr>
+                <th scope="col">Games</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody id="showGame"></tbody>
+    </table>
+    <table class=" table">
+        <thead class="black white-text" style="background: grey; color: white;">
+            <tr>
+                <th scope="col">Sản phẩm công nghệ</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody id="showTech"></tbody>
+    </table>
+
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var urlg = '@Url.Action("showDetailCate", "Home")';
+        $.ajax({
+            type: "GET",
+            url: urlg,
+            data: { id: 1 },
+            success: function (res) {
+                var html = '';
+                $.each(res, function (key, item) {
+                    html += '<tr>';
+                    html += '<th><a style="color:black; cursor:pointer;" href="/Thread/DetailThread/' + item.id + '">' + item.chude + '</a></th>';
+                    html += '<th></th>';
+                    html += '<th></th>';
+                    html += '</tr>';
+                });
+                $('#showCate').append(html);
+            },
+        });
+        var urlg = '@Url.Action("showDetailCate", "Home")';
+        $.ajax({
+            type: "GET",
+            url: urlg,
+            data: { id: 2 },
+            success: function (res) {
+                var html = '';
+                $.each(res, function (key, item) {
+                    html += '<tr>';
+                    html += '<th><a style="color:black; cursor:pointer;" href="/Thread/DetailThread/' + item.id + '">' + item.chude + '</a></th>';
+                    html += '<th></th>';
+                    html += '<th></th>';
+                    html += '</tr>';
+                });
+                $('#showGame').append(html);
+            }
+        });
+        var urlg = '@Url.Action("showDetailCate", "Home")';
+        $.ajax({
+            type: "GET",
+            url: urlg,
+            data: { id: 3 },
+            success: function (res) {
+                var html = '';
+                $.each(res, function (key, item) {
+                    html += '<tr>';
+                    html += '<th><a style="color:black; cursor:pointer;" href="/Thread/DetailThread/' + item.id + '">' + item.chude + '</a></th>';
+                    html += '<th></th>';
+                    html += '<th></th>';
+                    html += '</tr>';
+                });
+                $('#showTech').append(html);
+            }
+        });
+        var urlg = '@Url.Action("showDetailCate", "Home")';
+        $.ajax({
+            type: "GET",
+            url: urlg,
+            data: { id: 4 },
+            success: function (res) {
+                var html = '';
+                $.each(res, function (key, item) {
+                    html += '<tr>';
+                    html += '<th><a style="color:black; cursor:pointer;" href="/Thread/DetailThread/' + item.id + '">' + item.chude + '</a></th>';
+
+                    html += '<th></th>';
+                    html += '<th></th>';
+                    html += '</tr>';
+                });
+                $('#showHall').append(html);
+            }
+        })
+    })
+
+</script>

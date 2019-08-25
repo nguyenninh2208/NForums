@@ -1,0 +1,73 @@
+﻿@model List<nForums.Models.POST>
+
+@{
+    ViewBag.Title = @ViewBag.name;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewBag.name</h2>
+
+<table class="table table-detail-thread">
+
+    @if (ViewBag.count == 0)
+    {
+        <tr>
+            <td>
+                Danh mục này chưa có bài viết nào!
+            </td>
+
+        </tr>
+    }
+
+
+    @foreach (var item in Model)
+    {
+        <tr id="post-id-tr" data-id="@item.ID">
+            <td class="subject-td">
+                <a href="/Post/showPostDetail/@item.ID">@item.SUBJECT</a> 
+            </td>
+            <td class="more-td"><i class="fa fa-user" aria-hidden="true"></i> Đăng bởi @item.USER.USERNAME</td>
+            <td class="more-td"><i class="fa fa-clock-o" aria-hidden="true"></i> Vào lúc @String.Format("{0:dd/MM/yyyy}", @item.CREATED) </td>
+            <td class="more-td clear-td"><i class="fa fa-thumbs-up" aria-hidden="true"></i> Có <span id="count-like-2"></span> lượt thích </td>
+            <td class="more-td"><i class="fa fa-comments" aria-hidden="true"></i><span style="color:red; font-weight:bold;"> @item.COMMENTs.Count </span> bình luận</td>
+           
+        </tr>
+    }
+
+
+
+</table>
+<a class="btn btn-default new-thread" id="@ViewBag.idThread" href="/Thread/NewThread" style="font-weight:bold;">
+    Đăng bài
+</a>
+@if(Session["UserID"] == null){
+<h3 class="text-danger">Đăng nhập để đăng bài <a href="/Account/Login"><i class="fa fa-link" aria-hidden="true"></i> Đăng nhập</a></h3>
+}
+<h2>
+   
+</h2>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var id = $('tr#post-id-tr').attr("data-id");
+        $.ajax({
+            url: '/Post/showLikePost',
+            type: "GET",
+            data: {
+                id: id
+            },
+            success: function (res) {
+                var html = '';
+                var length = res.length;
+                if (length == 0) {
+                    $('td.clear-td').remove();
+                } else {
+                    $('#count-like-2').text(length);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert(xhr.responseText);
+            }
+        })
+    })
+</script>
